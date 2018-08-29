@@ -102,7 +102,7 @@ void ESP8266WebServer::begin(uint16_t port) {
 
 String ESP8266WebServer::_extractParam(String& authReq,const String& param,const char delimit){
   int _begin = authReq.indexOf(param);
-  if (_begin == -1) 
+  if (_begin == -1)
     return "";
   return authReq.substring(_begin+param.length(),authReq.indexOf(delimit,_begin+param.length()));
 }
@@ -266,6 +266,10 @@ void ESP8266WebServer::_addRequestHandler(RequestHandler* handler) {
 
 void ESP8266WebServer::serveStatic(const char* uri, FS& fs, const char* path, const char* cache_header) {
     _addRequestHandler(new StaticRequestHandler(fs, path, uri, cache_header));
+}
+
+void ESP8266WebServer::serveStatic(const char* uri, FS& fs, const char* path, headerHandler headers) {
+    _addRequestHandler(new StaticRequestHandler(fs, path, uri, headers));
 }
 
 void ESP8266WebServer::handleClient() {

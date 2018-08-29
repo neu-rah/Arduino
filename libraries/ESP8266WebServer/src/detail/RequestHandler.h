@@ -1,6 +1,8 @@
 #ifndef REQUESTHANDLER_H
 #define REQUESTHANDLER_H
 
+using headerHandler=bool (*)(ESP8266WebServer&, HTTPMethod, String);
+
 class RequestHandler {
 public:
     virtual ~RequestHandler() { }

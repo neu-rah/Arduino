@@ -70,6 +70,17 @@ public:
         _baseUriLength = _uri.length();
     }
 
+    StaticRequestHandler(FS& fs, const char* path, const char* uri, headerHandler headers)
+    : _fs(fs)
+    , _uri(uri)
+    , _path(path)
+    , _headers(headers)
+    {
+        _isFile = fs.exists(path);
+        DEBUGV("StaticRequestHandler: path=%s uri=%s isFile=%d, cache_header=%s\r\n", path, uri, _isFile, cache_header);
+        _baseUriLength = _uri.length();
+    }
+
     bool canHandle(HTTPMethod requestMethod, String requestUri) override  {
         if (requestMethod != HTTP_GET)
             return false;
@@ -88,10 +99,14 @@ public:
 
         String path(_path);
 
+        // add a chance for user to customize headers
+        if (_headers)
+          if (!_headers(server, requestMethod, requestUri)) return false;//user can interrupt and send 304
+
         if (!_isFile) {
             // Base URI doesn't point to a file.
             // If a directory is requested, look for index file.
-            if (requestUri.endsWith("/")) 
+            if (requestUri.endsWith("/"))
               requestUri += "index.htm";
 
             // Append whatever follows this URI in request to get the file path.
@@ -140,6 +155,7 @@ protected:
     String _uri;
     String _path;
     String _cache_header;
+    headerHandler _headers=NULL;
     bool _isFile;
     size_t _baseUriLength;
 };

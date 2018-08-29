@@ -89,6 +89,7 @@ public:
   void on(const String &uri, HTTPMethod method, THandlerFunction fn, THandlerFunction ufn);
   void addHandler(RequestHandler* handler);
   void serveStatic(const char* uri, fs::FS& fs, const char* path, const char* cache_header = NULL );
+  void serveStatic(const char* uri, fs::FS& fs, const char* path, headerHandler headers);
   void onNotFound(THandlerFunction fn);  //called when handler is not assigned
   void onFileUpload(THandlerFunction fn); //handle file uploads
 
@@ -129,12 +130,12 @@ public:
 
   static String urlDecode(const String& text);
 
-  template<typename T> 
+  template<typename T>
   size_t streamFile(T &file, const String& contentType) {
     _streamFileCore(file.size(), file.name(), contentType);
     return _currentClient.write(file);
   }
-  
+
 protected:
   virtual size_t _currentClientWrite(const char* b, size_t l) { return _currentClient.write( b, l ); }
   virtual size_t _currentClientWrite_P(PGM_P b, size_t l) { return _currentClient.write_P( b, l ); }
@@ -150,7 +151,7 @@ protected:
   uint8_t _uploadReadByte(WiFiClient& client);
   void _prepareHeader(String& response, int code, const char* content_type, size_t contentLength);
   bool _collectHeader(const char* headerName, const char* headerValue);
- 
+
   void _streamFileCore(const size_t fileSize, const String & fileName, const String & contentType);
 
   String _getRandomHexString();
